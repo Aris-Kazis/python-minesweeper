@@ -146,7 +146,7 @@ class MineSweeper(object):
 
                     if isinstance(elem, Mine):
                         adjacent_mines += 1
-
+                         
         return adjacent_mines
 
     def gridloc_inbounds(self, x, y):
@@ -303,18 +303,25 @@ class MineSweeper(object):
         return (x, y)
 
     def zeroClicked(self, r, c):
+        def zero_helper(self, r, c):
+            elem = self.grid[r][c]
+            # print('considering ', row, col, elem.drawn)
+            if not elem.drawn and isinstance(elem, SafeSpot):
+                # print('visiting ', row, col)
+                x, y = self.translate_gridrc_to_cartesianxy(r, c)
+                elem.draw(self.drawer, x, y)
+
+                if elem.numAdjacent == 0:
+                    self.zeroClicked(r, c)
+
+
+        self.iterate_neighbors(r, c, zero_helper)
+
+    def iterate_neighbors(self, r, c, cb):
         for col in range(c-1, c+2):
             for row in range(r-1, r+2):
                 if not (col == c and row == r) and self.gridloc_inbounds(col, row):
-                    elem = self.grid[row][col]
-                    # print('considering ', row, col, elem.drawn)
-                    if not elem.drawn and isinstance(elem, SafeSpot):
-                        # print('visiting ', row, col)
-                        x, y = self.translate_gridrc_to_cartesianxy(row, col)
-                        elem.draw(self.drawer, x, y)
-
-                        if elem.numAdjacent == 0:
-                            self.zeroClicked(row, col)
+                    cb(self, row, col)      
 
 def main():
     MineSweeper(10, 10, 0.15, "sprites.csv")
