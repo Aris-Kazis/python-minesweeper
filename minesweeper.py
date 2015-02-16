@@ -140,7 +140,7 @@ class MineSweeper(object):
 
         for col in range(x-1, x+2):
             for row in range(y-1, y+2):
-                if not (col == x and row == y) and self.loc_inbounds(col, row):
+                if not (col == x and row == y) and self.gridloc_inbounds(col, row):
                     elem = self.grid[row][col]
 
                     if isinstance(elem, Mine):
@@ -148,7 +148,7 @@ class MineSweeper(object):
 
         return adjacent_mines
 
-    def loc_inbounds(self, x, y):
+    def gridloc_inbounds(self, x, y):
         if x < 0 or y < 0 or y >= self.height or x >= self.width:
             return False
 
@@ -204,26 +204,34 @@ class MineSweeper(object):
 
 
     def right_clicked(self, x, y):
+        if not self.screenloc_inbounds(x,y):
+            return
+
         topx, topy = self.get_box_topleft_coords(x, y)
         self.spriteDict['blackbox'].draw(self.drawer, topx, topy)
 
     def clicked(self, x, y):
-        if x < -1 * self.halfw or y < -1 * self.halfh:
+        if not self.screenloc_inbounds(x,y):
             return
-
-        if x > self.halfw or y > self.halfh:
-            return
-
-        # set x and y now equal to the top left x,y coords of the clicked box
-        x, y = self.get_box_topleft_coords(x, y)
-        grid_row, grid_col = self.translate_cartesianxy_to_gridrc(x, y)
+        # set topx and topy now equal to the top left x,y coords of the clicked box
+        topx, topy = self.get_box_topleft_coords(x, y)
+        grid_row, grid_col = self.translate_cartesianxy_to_gridrc(topx, topy)
         itm = self.grid[grid_row][grid_col]
 
         if not itm.drawn and isinstance(itm, Mine):
-            self.handle_mine(itm, x, y)
+            self.handle_mine(itm, topx, topy)
 
         if not itm.drawn and isinstance(itm, SafeSpot):
-            self.handle_safespot(itm, x, y)
+            self.handle_safespot(itm, topx, topy)
+
+    def screenloc_inbounds(self, x, y):
+        if x < -1 * self.halfw or y < -1 * self.halfh:
+            return False
+
+        if x > self.halfw or y > self.halfh:
+            return False
+
+        return True
 
     def handle_safespot(self, itm, x, y):
         itm.draw(self.drawer, x, y)
@@ -275,7 +283,7 @@ class MineSweeper(object):
     def zeroClicked(self, r, c):
         for col in range(c-1, c+2):
             for row in range(r-1, r+2):
-                if not (col == c and row == r) and self.loc_inbounds(col, row):
+                if not (col == c and row == r) and self.gridloc_inbounds(col, row):
                     elem = self.grid[row][col]
                     # print('considering ', row, col, elem.drawn)
 
