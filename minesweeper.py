@@ -93,10 +93,12 @@ class MineSweeper(object):
         self.spriteSetup(pixelCSV)
         self.gridSetup(prob)
         self.screenSetup()
+        self.marked_mines = [[False for i in range(self.width)] for j in range(self.height)]
 
     def spriteSetup(self, pixelCSV_fn):
         self.spriteDict = {'0': None}
-        blackbox_pix = [[(0,0,0) for i in range(25)] for j in range(25)]
+        blackbox_pix = [[(0,0,0) for i in range(23)] for j in range(24)]
+        whitebox_pix = [[(255,255,255) for i in range(23)] for j in range(24)]
 
         reader = csv.reader(open(pixelCSV_fn, 'r'))
 
@@ -113,8 +115,7 @@ class MineSweeper(object):
             cur_sprite.append(row)
 
         self.spriteDict['blackbox'] = Sprite(blackbox_pix)
-
-        # print(self.spriteDict['mine'].pixels[-6])
+        self.spriteDict['whitebox'] = Sprite(whitebox_pix)
 
     def gridSetup(self, prob):
         self.grid = [[None for i in range(self.width)] for j in range(self.height)]
@@ -202,13 +203,19 @@ class MineSweeper(object):
                     t.down()
                     t.forward(1)
 
-
     def right_clicked(self, x, y):
         if not self.screenloc_inbounds(x,y):
             return
 
         topx, topy = self.get_box_topleft_coords(x, y)
-        self.spriteDict['blackbox'].draw(self.drawer, topx, topy)
+        r, c = self.translate_cartesianxy_to_gridrc(topx, topy)
+
+        if self.marked_mines[r][c]:
+            self.spriteDict['whitebox'].draw(self.drawer, topx+1, topy-1)
+            self.marked_mines[r][c] = False
+        else:
+            self.spriteDict['blackbox'].draw(self.drawer, topx+1, topy-1)   
+            self.marked_mines[r][c] = True         
 
     def clicked(self, x, y):
         if not self.screenloc_inbounds(x,y):
@@ -251,7 +258,7 @@ class MineSweeper(object):
                         self.display_topleft_message("YOU WIN! :)")
                         # self.drawer.write("YOU WIN", font=('Calibri', 16, 'normal'))
                         self.screen.exitonclick()
-
+ 
     # lose condition
     def handle_mine(self, itm, x, y):
         red_rgb = (255, 0, 0)
