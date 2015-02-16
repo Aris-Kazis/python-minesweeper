@@ -207,6 +207,10 @@ class MineSweeper(object):
         if not self.screenloc_inbounds(x,y):
             return
 
+        self.toggle_box_color(x,y)
+
+    # Input any coord from the screen
+    def toggle_box_color(self, x, y):
         topx, topy = self.get_box_topleft_coords(x, y)
         r, c = self.translate_cartesianxy_to_gridrc(topx, topy)
 
@@ -215,7 +219,7 @@ class MineSweeper(object):
             self.marked_mines[r][c] = False
         else:
             self.spriteDict['blackbox'].draw(self.drawer, topx+1, topy-1)   
-            self.marked_mines[r][c] = True         
+            self.marked_mines[r][c] = True
 
     def clicked(self, x, y):
         if not self.screenloc_inbounds(x,y):
@@ -224,6 +228,10 @@ class MineSweeper(object):
         topx, topy = self.get_box_topleft_coords(x, y)
         grid_row, grid_col = self.translate_cartesianxy_to_gridrc(topx, topy)
         itm = self.grid[grid_row][grid_col]
+
+        # disable clicking marked spots
+        if self.marked_mines[grid_row][grid_col]:
+            return
 
         if not itm.drawn and isinstance(itm, Mine):
             self.handle_mine(itm, topx, topy)
@@ -254,10 +262,12 @@ class MineSweeper(object):
                 for c, col in enumerate(row):
                     if isinstance(col, Mine):
                         topx, topy = self.translate_gridrc_to_cartesianxy(r, c)
-                        col.draw(self.drawer, topx, topy)
-                        self.display_topleft_message("YOU WIN! :)")
-                        # self.drawer.write("YOU WIN", font=('Calibri', 16, 'normal'))
-                        self.screen.exitonclick()
+                        if self.marked_mines[r][c]:
+                            self.toggle_box_color(topx,topy) # clear box to white
+                        col.draw(self.drawer, topx, topy) # drawn mine
+            
+            self.display_topleft_message("YOU WIN! :)")
+            self.screen.exitonclick()
  
     # lose condition
     def handle_mine(self, itm, x, y):
@@ -298,7 +308,6 @@ class MineSweeper(object):
                 if not (col == c and row == r) and self.gridloc_inbounds(col, row):
                     elem = self.grid[row][col]
                     # print('considering ', row, col, elem.drawn)
-
                     if not elem.drawn and isinstance(elem, SafeSpot):
                         # print('visiting ', row, col)
                         x, y = self.translate_gridrc_to_cartesianxy(row, col)
