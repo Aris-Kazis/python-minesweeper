@@ -248,10 +248,9 @@ class MineSweeper(object):
                     if isinstance(col, Mine):
                         topx, topy = self.translate_gridrc_to_cartesianxy(r, c)
                         col.draw(self.drawer, topx, topy)
+                        self.display_topleft_message("YOU WIN! :)")
+                        # self.drawer.write("YOU WIN", font=('Calibri', 16, 'normal'))
                         self.screen.exitonclick()
-
-
-        # print(self.grid)
 
     # lose condition
     def handle_mine(self, itm, x, y):
@@ -259,7 +258,13 @@ class MineSweeper(object):
         red_sprite = Sprite([[red_rgb]*25]*25)
         red_sprite.draw(self.drawer, x, y)
         itm.draw(self.drawer, x, y)
+        self.display_topleft_message("YOU LOSE :(")
         self.screen.exitonclick()
+
+    def display_topleft_message(self, msg):
+        self.drawer.up()
+        self.drawer.setpos(-1*self.halfw, self.halfh)
+        self.drawer.write(msg, font=('Calibri', 20, 'normal'))
 
     def translate_cartesianxy_to_gridrc(self, x, y):
         grid_row = math.floor( (self.halfh - y) / 25 )
