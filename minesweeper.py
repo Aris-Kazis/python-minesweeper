@@ -97,7 +97,6 @@ class MineSweeper(object):
     def spriteSetup(self, pixelCSV_fn):
         self.spriteDict = {'0': None}
         blackbox_pix = [[(0,0,0) for i in range(25)] for j in range(25)]
-        self.spriteDict['9'] = Sprite(blackbox_pix)
 
         reader = csv.reader(open(pixelCSV_fn, 'r'))
 
@@ -112,6 +111,8 @@ class MineSweeper(object):
                 sprite_idx += 1
                 cur_sprite = []
             cur_sprite.append(row)
+
+        self.spriteDict['blackbox'] = Sprite(blackbox_pix)
 
         # print(self.spriteDict['mine'].pixels[-6])
 
@@ -204,7 +205,7 @@ class MineSweeper(object):
 
     def right_clicked(self, x, y):
         topx, topy = self.get_box_topleft_coords(x, y)
-        self.spriteDict['9'].draw(self.drawer, topx, topy)
+        self.spriteDict['blackbox'].draw(self.drawer, topx, topy)
 
     def clicked(self, x, y):
         if x < -1 * self.halfw or y < -1 * self.halfh:
