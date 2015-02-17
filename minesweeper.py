@@ -310,7 +310,7 @@ class MineSweeper(object):
         return (topx, topy)
 
     def get_box_topleft_coords(self, x, y):
-        while (x + self.halfw) % 25 != 0:
+        while ( x - (-1*self.halfw) ) % 25 != 0:
             x -= 1
 
         while (self.halfh - y) % 25 != 0:
