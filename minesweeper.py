@@ -146,7 +146,7 @@ class MineSweeper(object):
 
                     if isinstance(elem, Mine):
                         adjacent_mines += 1
-                         
+
         return adjacent_mines
 
     def gridloc_inbounds(self, x, y):
@@ -193,10 +193,21 @@ class MineSweeper(object):
             self.halfh = int( h / 2 )
             self.halfw = int( w / 2 )
 
-        for row in range(-1*self.halfh, self.halfh+1):
-            for col in range(-1*self.halfw, self.halfw+1):
-                if row % 25 == 0 \
-                    or col % 25 == 0:
+        hoff = 1
+        woff = 1
+
+        if self.height % 2 != 0:
+            hoff += 1
+
+        if self.width % 2 != 0:
+            woff += 1
+
+        for row in range(-1*self.halfh, self.halfh+hoff):
+            for col in range(-1*self.halfw, self.halfw+woff):
+                rowi = row - (-1*self.halfh)
+                coli = col - (-1*self.halfw)
+                if rowi % 25 == 0 \
+                    or coli % 25 == 0:
                     
                     t.up()
                     t.setpos(col, row)
@@ -206,7 +217,7 @@ class MineSweeper(object):
     def right_clicked(self, x, y):
         if not self.screenloc_inbounds(x,y):
             return
-
+        print(x,y)
         self.toggle_box_color(x,y)
 
     # Input any coord from the screen
@@ -228,6 +239,10 @@ class MineSweeper(object):
         topx, topy = self.get_box_topleft_coords(x, y)
         grid_row, grid_col = self.translate_cartesianxy_to_gridrc(topx, topy)
         itm = self.grid[grid_row][grid_col]
+        print(topx, topy)
+        print(grid_row, grid_col)
+        print(itm)
+        print(self.grid)
 
         # disable clicking marked spots
         if self.marked_mines[grid_row][grid_col]:
@@ -286,6 +301,7 @@ class MineSweeper(object):
     def translate_cartesianxy_to_gridrc(self, x, y):
         grid_row = math.floor( (self.halfh - y) / 25 )
         grid_col = math.floor( (x + self.halfw) / 25 )
+        print('translated r,c', grid_row,grid_col, self.halfh, self.halfw)
         return (grid_row, grid_col)
 
     def translate_gridrc_to_cartesianxy(self, r, c):
@@ -294,10 +310,10 @@ class MineSweeper(object):
         return (topx, topy)
 
     def get_box_topleft_coords(self, x, y):
-        while x % 25 != 0:
+        while (x + self.halfw) % 25 != 0:
             x -= 1
 
-        while y % 25 != 0:
+        while (self.halfh - y) % 25 != 0:
             y += 1
 
         return (x, y)
@@ -324,7 +340,7 @@ class MineSweeper(object):
                     cb(self, row, col)      
 
 def main():
-    MineSweeper(10, 10, 0.15, "sprites.csv")
+    MineSweeper(9, 9, 0.15, "sprites.csv")
     turtle.done()
 
 if __name__ == '__main__':
