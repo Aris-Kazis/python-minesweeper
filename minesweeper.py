@@ -340,7 +340,7 @@ class MineSweeper(object):
                     cb(self, row, col)      
 
 def main():
-    MineSweeper(9, 9, 0.15, "sprites.csv")
+    MineSweeper(7, 7, 0.15, "sprites.csv")
     turtle.done()
 
 if __name__ == '__main__':
