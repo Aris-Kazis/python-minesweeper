@@ -193,22 +193,20 @@ class MineSweeper(object):
             self.halfh = int( h / 2 )
             self.halfw = int( w / 2 )
 
-        hoff = 1
         woff = 1
-
-        if self.height % 2 != 0:
-            hoff += 1
+        neghoff = 0
 
         if self.width % 2 != 0:
             woff += 1
 
-        for row in range(-1*self.halfh, self.halfh+hoff):
+        if self.height % 2 != 0:
+            neghoff += 1
+
+        for row in range(-1*self.halfh-neghoff, self.halfh+1):
             for col in range(-1*self.halfw, self.halfw+woff):
-                rowi = row - (-1*self.halfh)
+                rowi = self.halfh - row
                 coli = col - (-1*self.halfw)
-                if rowi % 25 == 0 \
-                    or coli % 25 == 0:
-                    
+                if rowi % 25 == 0 or coli % 25 == 0:
                     t.up()
                     t.setpos(col, row)
                     t.down()
@@ -340,7 +338,7 @@ class MineSweeper(object):
                     cb(self, row, col)      
 
 def main():
-    MineSweeper(7, 7, 0.15, "sprites.csv")
+    MineSweeper(20, 20, 0.15, "sprites.csv")
     turtle.done()
 
 if __name__ == '__main__':
