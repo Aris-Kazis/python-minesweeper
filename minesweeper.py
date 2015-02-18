@@ -223,6 +223,9 @@ class MineSweeper(object):
         topx, topy = self.get_box_topleft_coords(x, y)
         r, c = self.translate_cartesianxy_to_gridrc(topx, topy)
 
+        if self.grid[r][c].drawn:
+            return
+
         if self.marked_mines[r][c]:
             self.spriteDict['whitebox'].draw(self.drawer, topx+1, topy-1)
             self.marked_mines[r][c] = False
@@ -338,7 +341,11 @@ class MineSweeper(object):
                     cb(self, row, col)      
 
 def main():
-    MineSweeper(20, 20, 0.15, "sprites.csv")
+    #Boxes
+    GRID_WIDTH = 15
+    GRID_HEIGHT = 15
+
+    MineSweeper(GRID_WIDTH, GRID_HEIGHT, 0.15, "sprites.csv")
     turtle.done()
 
 if __name__ == '__main__':
